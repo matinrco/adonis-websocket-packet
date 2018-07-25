@@ -25,7 +25,8 @@ test.group('Packets', () => {
       LEAVE_ERROR: 6,
       EVENT: 7,
       PING: 8,
-      PONG: 9
+      PONG: 9,
+      ACK: 10
     })
   })
 

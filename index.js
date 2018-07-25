@@ -26,7 +26,8 @@
  *  LEAVE_ERROR: 6,
  *  EVENT: 7,
  *  PING: 8,
- *  PONG: 9
+ *  PONG: 9,
+ *  ACK: 10
  * }
  * ```
  */
@@ -40,7 +41,8 @@ const codes = {
   LEAVE_ERROR: 6,
   EVENT: 7,
   PING: 8,
-  PONG: 9
+  PONG: 9,
+  ACK: 10
 }
 
 /**
@@ -71,14 +73,20 @@ function ensureString (input, message) {
  * @param  {Number}   code
  * @param  {Object}   props
  * @param  {Array}   requiredProps
+ * @param  {Array}   optionalProps
  *
  * @return {Object}
  *
  * @private
  */
-function makePacket (code, props, requiredProps) {
+function makePacket (code, props, requiredProps, optionalProps = []) {
   requiredProps.forEach((rP) => {
     ensureString(props[rP], `expected ${rP} to be a valid string`)
+  })
+  optionalProps.forEach((oP) => {
+    if (typeof (props[oP]) === 'undefined') {
+      delete props[oP]
+    }
   })
   return { t: code, d: props }
 }
@@ -189,6 +197,16 @@ const fns = {}
  */
 
 /**
+ * Validates if packet code is a `ACK` code.
+ *
+ * @method isAckPacket
+ *
+ * @param {Object} packet
+ *
+ * @return {Boolean}
+ */
+
+/**
  * Dynamically adding `if<Code>Packet` methods. Example
  *
  * `OPEN` will have `isOpenPacket` method
@@ -241,6 +259,16 @@ fns.isValidLeavePacket = fns.hasTopic
  * @type {Boolean}
  */
 fns.isValidEventPacket = fns.hasTopic
+
+/**
+ * Makes sure packet is a valid ack packet. Do call `isAckPacket`
+ * before calling this method.
+ *
+ * @method isValidAckPacket
+ *
+ * @type {Boolean}
+ */
+fns.isValidAckPacket = fns.hasTopic
 
 /**
  * Makes a join packet
@@ -344,6 +372,7 @@ fns.leaveErrorPacket = function (topic, message) {
  * @param  {String}    topic
  * @param  {String}    event
  * @param  {Mixed}     data
+ * @param  {Number}    id
  *
  * @return {Object}
  *
@@ -351,9 +380,8 @@ fns.leaveErrorPacket = function (topic, message) {
  * @throws {Error} If event is not defined
  * @throws {Error} If data is not defined
  */
-fns.eventPacket = function (topic, event, data) {
-  data = data || ''
-  return makePacket(codes.EVENT, { topic, event, data }, ['topic', 'event'])
+fns.eventPacket = function (topic, event, data = '', id) {
+  return makePacket(codes.EVENT, { topic, event, data, id }, ['topic', 'event'], ['id'])
 }
 
 /**
@@ -376,6 +404,25 @@ fns.pingPacket = function () {
  */
 fns.pongPacket = function () {
   return { t: codes.PONG }
+}
+
+/**
+ * Makes the ack packet
+ *
+ * @method ackPacket
+ *
+ * @param  {String}    topic
+ * @param  {Number}    id
+ * @param  {Mixed}     data
+ *
+ * @return {Object}
+ *
+ * @throws {Error} If topic is not defined or not a string
+ * @throws {Error} If id is not defined
+ * @throws {Error} If data is not defined
+ */
+fns.ackPacket = function (topic, id, data = '') {
+  return makePacket(codes.ACK, { topic, id, data }, ['topic'])
 }
 
 export default Object.assign({ codes }, fns)
