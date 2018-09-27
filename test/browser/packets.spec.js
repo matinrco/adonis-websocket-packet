@@ -24,7 +24,8 @@ group('Packets', () => {
       EVENT: 7,
       PING: 8,
       PONG: 9,
-      ACK: 10
+      ACK: 10,
+      ACK_ERROR: 11
     })
   })
 

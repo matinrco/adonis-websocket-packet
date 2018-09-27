@@ -27,7 +27,8 @@
  *  EVENT: 7,
  *  PING: 8,
  *  PONG: 9,
- *  ACK: 10
+ *  ACK: 10,
+ *  ACK_ERROR: 11
  * }
  * ```
  */
@@ -42,7 +43,8 @@ const codes = {
   EVENT: 7,
   PING: 8,
   PONG: 9,
-  ACK: 10
+  ACK: 10,
+  ACK_ERROR: 11
 }
 
 /**
@@ -207,6 +209,16 @@ const fns = {}
  */
 
 /**
+ * Validates if packet code is a `ACK_ERROR` code.
+ *
+ * @method isAckErrorPacket
+ *
+ * @param {Object} packet
+ *
+ * @return {Boolean}
+ */
+
+/**
  * Dynamically adding `if<Code>Packet` methods. Example
  *
  * `OPEN` will have `isOpenPacket` method
@@ -269,6 +281,16 @@ fns.isValidEventPacket = fns.hasTopic
  * @type {Boolean}
  */
 fns.isValidAckPacket = fns.hasTopic
+
+/**
+ * Makes sure packet is a valid ack error packet. Do call `isAckErrorPacket`
+ * before calling this method.
+ *
+ * @method isValidAckErrorPacket
+ *
+ * @type {Boolean}
+ */
+fns.isValidAckErrorPacket = fns.hasTopic
 
 /**
  * Makes a join packet
@@ -423,6 +445,24 @@ fns.pongPacket = function () {
  */
 fns.ackPacket = function (topic, id, data = '') {
   return makePacket(codes.ACK, { topic, id, data }, ['topic'])
+}
+
+/**
+ * Makes join error packet
+ *
+ * @method ackErrorPacket
+ *
+ * @param  {String}   topic
+ * @param  {Number}   id
+ * @param  {String}   message
+ *
+ * @return {Object}
+ *
+ * @throws {Error} If topic is not defined or not a string
+ * @throws {Error} If message is not defined or not a string
+ */
+fns.ackErrorPacket = function (topic, id, message) {
+  return makePacket(codes.ACK_ERROR, { topic, id, message }, ['topic', 'message'])
 }
 
 export default Object.assign({ codes }, fns)
