@@ -30,7 +30,7 @@
     "babel-preset-env": "^1.6.1",
     "japa": "^1.0.6",
     "japa-cli": "^1.0.1",
-    "karma": "^2.0.0",
+    "karma": "^6.3.14",
     "karma-chrome-launcher": "^2.2.0",
     "karma-japa": "^1.0.2",
     "karma-rollup-preprocessor": "^5.1.1",
